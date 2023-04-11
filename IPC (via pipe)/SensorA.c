@@ -14,7 +14,7 @@ int open_pipe (HANDLE* hPipe, char nome[]){
 int enviar_servidor(HANDLE* hPipe,char buffer[BUFFER_SIZE],  DWORD* dwWritten){
     if (!WriteFile(*hPipe, buffer, strlen(buffer) + 1, dwWritten, NULL)){// dwWritten é pasado por ponteiro, etão é pasado diretametne
         printf("Falha em escrever no pipe. Codigo do erro: %d\n", GetLastError());
-        CloseHandle(*hPipe);
+        //CloseHandle(*hPipe);
         return 1;
     }
     return 0;
@@ -23,7 +23,7 @@ int receber_servidor(HANDLE* hPipe,char buffer[BUFFER_SIZE],  DWORD* dwRead){
     if (!ReadFile(*hPipe, buffer, BUFFER_SIZE, dwRead, NULL))// dwRead é pasado por ponteiro, etão é pasado diretametne
     {
         printf("Falha em ler do pipe. Codigo do erro: %d\n", GetLastError());
-        CloseHandle(*hPipe);
+        //CloseHandle(*hPipe);
         return 1;
     }
     return 0;

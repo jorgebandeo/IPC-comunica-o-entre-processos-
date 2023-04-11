@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <unistd.h>
 
 #define BUFFER_SIZE 1024
 int open_pipe (HANDLE* hPipe, char nome[]){
@@ -40,31 +41,40 @@ int main()
     DWORD dwReadDsplay, dwWrittenDsplay;
     
     while (confirmador == 1){
+        printf("0");
         confirmador = open_pipe(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
     }
     confirmador = 1;
     
     
     printf("Conectado ao servidor!\n");
-    sprintf(bufferParada, "%d",0);
+    while (confirmador == 1){
+        printf("2.9");
+        confirmador = receber_servidor(&PipeDsplay, bufferParada, &dwReadDsplay);
+    }
+    confirmador = 1;
 
- 
+    printf(bufferParada);
+    sleep(5);
     while (bufferParada != "-1"){
         if(bufferParada == "1"){
             while (confirmador == 1){
+                printf("1");
                 confirmador = receber_servidor(&PipeDsplay, bufferDsplay, &dwReadDsplay);
             }
             confirmador = 1;
             
             printf(bufferDsplay);
         }
-        while (confirmador == 1){
-            confirmador = receber_servidor(&PipeDsplay, bufferParada, &dwReadDsplay);
+        
+
+        if (receber_servidor(&PipeDsplay, bufferParada, &dwReadDsplay) == 1 ){
+           sprintf(bufferDsplay,"0");
         }
-        confirmador = 1;
+
         
     }
-    
+    printf("finaliza");
     CloseHandle(PipeDsplay);
     
     return 0;

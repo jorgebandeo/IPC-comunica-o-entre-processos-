@@ -54,6 +54,7 @@ int escrita_cliente(HANDLE* hPipe, char buffer[BUFFER_SIZE],DWORD* dwRead){
         CloseHandle(*hPipe);
         return 1;
     }
+    return 0;
 }
 int sair(){
     int key;
@@ -83,12 +84,7 @@ int main()
     int confirmador = 1;
 
     char bufferParada[BUFFER_SIZE];
-    /*inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios (1 - continua, 0 - pausa, -1 para)
-    sprintf(bufferParada,"0");
-    while (confirmador == 1){
-        confirmador = escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
-    }
-    confirmador = 1; */
+
     
 
     HANDLE PipeSensorA;
@@ -111,22 +107,29 @@ int main()
     inizializador(&PipeSensorB,"\\\\.\\pipe\\SensorB");
     inizializador(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
     
+    printf(" inicio");
+    
     sprintf(bufferParada,"1");
     while (confirmador == 1){
+        printf("0");
         confirmador = escrita_cliente(&PipeSensorA, bufferParada, &dwReadSensorA);
     }
     confirmador = 1; 
-    while (confirmador == 1){
-        confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
-    }
-    confirmador = 1; 
-    while (confirmador == 1){
+    while (confirmador == 1){//ERRO 
+        printf("2");
         confirmador = escrita_cliente(&PipeDsplay, bufferParada, &dwReadDsplay);
     }
     confirmador = 1; 
+    while (confirmador == 1){
+        printf("1");
+        confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
+    }
+    confirmador = 1; 
+    
+    printf("parada setada");
 
     while (sair() == 0)
-    {
+    {   printf("processadno");
         while (confirmador == 1){
             confirmador = leitura_cliente(&PipeSensorA,bufferSensorA, &dwReadSensorA);
         }
