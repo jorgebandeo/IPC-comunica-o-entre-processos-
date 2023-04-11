@@ -30,31 +30,42 @@ int receber_servidor(HANDLE* hPipe,char buffer[BUFFER_SIZE],  DWORD* dwRead){
 }
 int main()
 {
+    int confirmador = 1;
     HANDLE PipeDsplay;
-    HANDLE PipeParada;
+    
 
     char bufferDsplay[BUFFER_SIZE];
     char bufferParada[BUFFER_SIZE];
 
     DWORD dwReadDsplay, dwWrittenDsplay;
-    DWORD dwReadParada, dwWrittenParada;
-
-    open_pipe(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
-    open_pipe(&PipeParada,"\\\\.\\pipe\\Parada");
+    
+    while (confirmador == 1){
+        confirmador = open_pipe(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
+    }
+    confirmador = 1;
+    
+    
     printf("Conectado ao servidor!\n");
-    sprintf(bufferParada, "%d", 1);
+    sprintf(bufferParada, "%d",0);
 
  
     while (bufferParada != "-1"){
         if(bufferParada == "1"){
-            receber_servidor(&PipeDsplay, bufferDsplay, &dwReadDsplay);
+            while (confirmador == 1){
+                confirmador = receber_servidor(&PipeDsplay, bufferDsplay, &dwReadDsplay);
+            }
+            confirmador = 1;
+            
             printf(bufferDsplay);
         }
-        receber_servidor(&PipeParada, bufferParada, &dwReadParada);
+        while (confirmador == 1){
+            confirmador = receber_servidor(&PipeDsplay, bufferParada, &dwReadDsplay);
+        }
+        confirmador = 1;
+        
     }
     
     CloseHandle(PipeDsplay);
-    CloseHandle(PipeParada);
     
     return 0;
 }

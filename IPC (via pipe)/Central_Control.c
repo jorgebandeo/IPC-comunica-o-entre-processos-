@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
+#include <conio.h>
 
 #define BUFFER_SIZE 1024
 int crear_name_pipe(HANDLE* hPipe, char nome[]){// Create named pipe
@@ -22,9 +23,19 @@ int conectividade(HANDLE* hPipe){// Wait for client to connect
 }
 
 int inizializador(HANDLE* hPipe,char nome[]){
-    crear_name_pipe(hPipe, nome );
+    int confirmador = 1;
+    while (confirmador == 1)
+    {
+        confirmador = crear_name_pipe(hPipe, nome );
+    }
+    confirmador = 1;
     printf("Esperando o cliente conectar...\n");
-    conectividade(hPipe);
+    while (confirmador == 1)
+    {
+        confirmador = conectividade(hPipe);
+    }
+    confirmador = 1;
+    
 }
 
 int leitura_cliente(HANDLE* hPipe, char buffer[BUFFER_SIZE],DWORD* dwRead){// Read data from client
@@ -45,10 +56,10 @@ int escrita_cliente(HANDLE* hPipe, char buffer[BUFFER_SIZE],DWORD* dwRead){
     }
 }
 int sair(){
-        int key;
+    int key;
     int time = 0;
 
-    while (time < 1000) {
+    while (time < 100) {
         if (kbhit()) {
             key = getch();
             if (key == 27) {
@@ -69,54 +80,121 @@ int main()
     int soma = 0;
     int soma_aniga = 0;
     int peso = 0;
+    int confirmador = 1;
+
+    char bufferParada[BUFFER_SIZE];
+    /*inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios (1 - continua, 0 - pausa, -1 para)
+    sprintf(bufferParada,"0");
+    while (confirmador == 1){
+        confirmador = escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
+    }
+    confirmador = 1; */
+    
 
     HANDLE PipeSensorA;
     HANDLE PipeSensorB;
     HANDLE PipeDsplay;
-    HANDLE PipeParada;
+    
 
     char bufferSensorA[BUFFER_SIZE];
     char bufferSensorB[BUFFER_SIZE];
     char bufferDsplay[BUFFER_SIZE];
-    char bufferParada[BUFFER_SIZE];
+    
 
     DWORD dwReadSensorA;
     DWORD dwReadSensorB;
     DWORD dwReadDsplay;
-    DWORD dwReadParada;
+ 
     
     //Inizialização dos resvidores que vao atender cada ususario
     inizializador(&PipeSensorA,"\\\\.\\pipe\\SensorA");
     inizializador(&PipeSensorB,"\\\\.\\pipe\\SensorB");
     inizializador(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
-    inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios (1 - continua, 0 - pausa, -1 para)
-    sprintf(bufferDsplay,"1");
-    escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
-
+    
+    sprintf(bufferParada,"1");
+    while (confirmador == 1){
+        confirmador = escrita_cliente(&PipeSensorA, bufferParada, &dwReadSensorA);
+    }
+    confirmador = 1; 
+    while (confirmador == 1){
+        confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
+    }
+    confirmador = 1; 
+    while (confirmador == 1){
+        confirmador = escrita_cliente(&PipeDsplay, bufferParada, &dwReadDsplay);
+    }
+    confirmador = 1; 
 
     while (sair() == 0)
     {
-        leitura_cliente(&PipeSensorA,bufferSensorA, &dwReadSensorA);
-        leitura_cliente(&PipeSensorB,bufferSensorB, &dwReadSensorB);
+        while (confirmador == 1){
+            confirmador = leitura_cliente(&PipeSensorA,bufferSensorA, &dwReadSensorA);
+        }
+        confirmador = 1;   
+        while (confirmador == 1){
+            confirmador = leitura_cliente(&PipeSensorB,bufferSensorB, &dwReadSensorB);
+        }
+        confirmador = 1;
+        
         soma = atoi(bufferSensorA) + atoi(bufferSensorB);
         if (soma - soma_aniga >= 500){
             sprintf(bufferDsplay,"0");
-            escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorA, bufferParada, &dwReadSensorA);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeDsplay, bufferParada, &dwReadDsplay);
+            }
+            confirmador = 1;
 
             peso = peso + atoi(bufferSensorA) * 2 + atoi(bufferSensorB)*5;
             soma_aniga = soma;
             
+            
             sprintf(bufferDsplay,"1");
-            escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorA, bufferParada, &dwReadSensorA);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeDsplay, bufferParada, &dwReadDsplay);
+            }
+            confirmador = 1;   
         }
         sprintf(bufferDsplay,"numero total de itens [%d] com um pesso calcuulado de [%s]",  soma, peso);
-        escrita_cliente(&PipeDsplay, bufferDsplay, &dwReadDsplay);
+        while (confirmador == 1){
+            confirmador = escrita_cliente(&PipeDsplay, bufferDsplay, &dwReadDsplay);
+        }
+        confirmador = 1;
+        
     }
-    
+    sprintf(bufferParada,"-1");
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorA, bufferParada, &dwReadSensorA);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeSensorB, bufferParada, &dwReadSensorB);
+            }
+            confirmador = 1;
+            while (confirmador == 1){
+                confirmador = escrita_cliente(&PipeDsplay, bufferParada, &dwReadDsplay);
+            }
+            confirmador = 1;
+     
     CloseHandle(PipeSensorA);
     CloseHandle(PipeSensorB);
     CloseHandle(PipeDsplay);
-    CloseHandle(PipeParada);
+    
     return 0;
 }
 

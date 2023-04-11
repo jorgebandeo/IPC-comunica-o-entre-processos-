@@ -30,19 +30,22 @@ int receber_servidor(HANDLE* hPipe,char buffer[BUFFER_SIZE],  DWORD* dwRead){
 }
 int main()
 {
-     HANDLE PipeSensorB;
-    HANDLE PipeParada;
-
+    int confirmador = 1;
+    HANDLE PipeSensorB;
+    
     char bufferSensorB[BUFFER_SIZE];
     char bufferParada[BUFFER_SIZE];
     
     DWORD dwReadSensorB, dwWrittenSensorB;
-    DWORD dwReadParada, dwWrittenParada;
+    while (confirmador == 1){
+            confirmador = open_pipe(&PipeSensorB,"\\\\.\\pipe\\SensorB");
+    }
+    confirmador = 1;
+    
+    
 
-    open_pipe(&PipeSensorB,"\\\\.\\pipe\\SensorB");
-    open_pipe(&PipeParada,"\\\\.\\pipe\\Parada");
     printf("Conectado ao servidor!\n");
-    sprintf(bufferParada, "%d", 1);
+    sprintf(bufferParada, "%d", 0);
     
     int i =0;
     while (bufferParada != "-1"){
@@ -50,13 +53,20 @@ int main()
             i = i +1;
             sprintf(bufferSensorB, "%d", i);
             printf("Dado recebido: %s\n", bufferSensorB);
-            enviar_servidor(&PipeSensorB, bufferSensorB,&dwWrittenSensorB);
+            while (confirmador == 1){
+                confirmador = enviar_servidor(&PipeSensorB, bufferSensorB,&dwWrittenSensorB);
+            }
+            confirmador = 1;
         }
-        receber_servidor(&PipeParada, bufferParada, &dwReadParada);
+        while (confirmador == 1){
+            confirmador = receber_servidor(&PipeSensorB, bufferParada, &dwReadSensorB);
+        }
+        confirmador = 1;
+        
     }
     
     CloseHandle(PipeSensorB);
-    CloseHandle(PipeParada);
+    
     
     return 0;
 }
