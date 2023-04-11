@@ -69,6 +69,7 @@ int main()
     int soma = 0;
     int soma_aniga = 0;
     int peso = 0;
+
     HANDLE PipeSensorA;
     HANDLE PipeSensorB;
     HANDLE PipeDsplay;
@@ -88,8 +89,9 @@ int main()
     inizializador(&PipeSensorA,"\\\\.\\pipe\\SensorA");
     inizializador(&PipeSensorB,"\\\\.\\pipe\\SensorB");
     inizializador(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
-    inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios    
-
+    inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios (1 - continua, 0 - pausa, -1 para)
+    sprintf(bufferDsplay,"1");
+    escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
 
 
     while (sair() == 0)
@@ -98,10 +100,17 @@ int main()
         leitura_cliente(&PipeSensorB,bufferSensorB, &dwReadSensorB);
         soma = atoi(bufferSensorA) + atoi(bufferSensorB);
         if (soma - soma_aniga >= 500){
+            sprintf(bufferDsplay,"0");
+            escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
+            
             peso = peso + atoi(bufferSensorA) * 2 + atoi(bufferSensorB)*5;
+            soma_aniga = soma;
+            
+            sprintf(bufferDsplay,"1");
+            escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
         }
-        
-
+        sprintf(bufferDsplay,"numero total de itens [%d] com um pesso calcuulado de [%s]",  soma, peso);
+        escrita_cliente(&PipeDsplay, bufferDsplay, &dwReadDsplay);
     }
     
     CloseHandle(PipeSensorA);
