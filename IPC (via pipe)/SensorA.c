@@ -35,12 +35,12 @@ int main()
 
     char bufferSensorA[BUFFER_SIZE];
     char bufferParada[BUFFER_SIZE];
-    
+
     DWORD dwReadSensorA, dwWrittenSensorA;
     DWORD dwReadParada, dwWrittenParada;
 
     open_pipe(&PipeSensorA,"\\\\.\\pipe\\SensorA");
-    open_pipe(&PipeSensorA,"\\\\.\\pipe\\Parada");
+    open_pipe(&PipeParada,"\\\\.\\pipe\\Parada");
     printf("Conectado ao servidor!\n");
     sprintf(bufferParada, "%d", 1);
     

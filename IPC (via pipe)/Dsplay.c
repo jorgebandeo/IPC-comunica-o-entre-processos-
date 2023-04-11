@@ -2,8 +2,8 @@
 #include <windows.h>
 
 #define BUFFER_SIZE 1024
-int open_pipe (HANDLE* hPipe){
-    *hPipe = CreateFile("\\\\.\\pipe\\pipeso",GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,0,NULL);
+int open_pipe (HANDLE* hPipe, char nome[]){
+    *hPipe = CreateFile(nome,GENERIC_READ | GENERIC_WRITE,0,NULL,OPEN_EXISTING,0,NULL);
     if (*hPipe == INVALID_HANDLE_VALUE){
         printf("Falha em abrir o pipe. Codigo do erro: %d\n", GetLastError());
         return 1;
@@ -30,19 +30,31 @@ int receber_servidor(HANDLE* hPipe,char buffer[BUFFER_SIZE],  DWORD* dwRead){
 }
 int main()
 {
-    HANDLE hPipe;
-    char buffer[BUFFER_SIZE];
-    DWORD dwRead, dwWritten;
+    HANDLE PipeDsplay;
+    HANDLE PipeParada;
 
-    open_pipe(&hPipe);
+    char bufferDsplay[BUFFER_SIZE];
+    char bufferParada[BUFFER_SIZE];
+
+    DWORD dwReadDsplay, dwWrittenDsplay;
+    DWORD dwReadParada, dwWrittenParada;
+
+    open_pipe(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
+    open_pipe(&PipeParada,"\\\\.\\pipe\\Parada");
     printf("Conectado ao servidor!\n");
-    printf("Entre com o dado a ser enviado: ");
-    fgets(buffer, BUFFER_SIZE, stdin);
-    enviar_servidor(&hPipe, buffer,&dwWritten);
-    printf("Dado enviado ao servidor.\n");
-    receber_servidor(&hPipe, buffer, &dwRead);
-    printf("Dado recebido: %s\n", buffer);
-    CloseHandle(hPipe);
+    sprintf(bufferParada, "%d", 1);
+
+ 
+    while (bufferParada != "-1"){
+        if(bufferParada == "1"){
+            receber_servidor(&PipeDsplay, bufferDsplay, &dwReadDsplay);
+            printf(bufferDsplay);
+        }
+        receber_servidor(&PipeParada, bufferParada, &dwReadParada);
+    }
+    
+    CloseHandle(PipeDsplay);
+    CloseHandle(PipeParada);
     
     return 0;
 }
