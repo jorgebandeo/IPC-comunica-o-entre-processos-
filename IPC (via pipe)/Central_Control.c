@@ -102,7 +102,7 @@ int main()
         if (soma - soma_aniga >= 500){
             sprintf(bufferDsplay,"0");
             escrita_cliente(&PipeParada, bufferParada, &dwReadParada);
-            
+
             peso = peso + atoi(bufferSensorA) * 2 + atoi(bufferSensorB)*5;
             soma_aniga = soma;
             
@@ -120,8 +120,3 @@ int main()
     return 0;
 }
 
-    /*leitura_cliente(&hPipe, buffer, &dwRead);
-    printf("Data recebido: %s\n", buffer);
-    escrita_cliente(&hPipe, buffer, &dwRead);
-    printf("Dado enviado de volta ao cliente.\n");
-    CloseHandle(hPipe);*/
