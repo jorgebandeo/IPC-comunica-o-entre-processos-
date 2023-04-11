@@ -44,30 +44,70 @@ int escrita_cliente(HANDLE* hPipe, char buffer[BUFFER_SIZE],DWORD* dwRead){
         return 1;
     }
 }
+int sair(){
+        int key;
+    int time = 0;
 
+    while (time < 1000) {
+        if (kbhit()) {
+            key = getch();
+            if (key == 27) {
+                printf("Tecla ESC pressionada!\n");
+                return 1;
+            }
+        }
+        Sleep(10); // espera 0,1 segundos
+        time += 10; // atualiza o tempo esperado
+    }
+
+    //printf("Nenhuma tecla pressionada!\n");
+    return 0;
+}
 int main()
 {
+
+    int soma = 0;
+    int soma_aniga = 0;
+    int peso = 0;
     HANDLE PipeSensorA;
     HANDLE PipeSensorB;
     HANDLE PipeDsplay;
+    HANDLE PipeParada;
 
     char bufferSensorA[BUFFER_SIZE];
     char bufferSensorB[BUFFER_SIZE];
     char bufferDsplay[BUFFER_SIZE];
+    char bufferParada[BUFFER_SIZE];
 
     DWORD dwReadSensorA;
     DWORD dwReadSensorB;
     DWORD dwReadDsplay;
+    DWORD dwReadParada;
     
     //Inizialização dos resvidores que vao atender cada ususario
     inizializador(&PipeSensorA,"\\\\.\\pipe\\SensorA");
     inizializador(&PipeSensorB,"\\\\.\\pipe\\SensorB");
     inizializador(&PipeDsplay,"\\\\.\\pipe\\Dsplay");
+    inizializador(&PipeParada,"\\\\.\\pipe\\Parada");// sinal de parada para os usuarios    
+
+
+
+    while (sair() == 0)
+    {
+        leitura_cliente(&PipeSensorA,bufferSensorA, &dwReadSensorA);
+        leitura_cliente(&PipeSensorB,bufferSensorB, &dwReadSensorB);
+        soma = atoi(bufferSensorA) + atoi(bufferSensorB);
+        if (soma - soma_aniga >= 500){
+            peso = peso + atoi(bufferSensorA) * 2 + atoi(bufferSensorB)*5;
+        }
+        
+
+    }
     
-
-
-
-
+    CloseHandle(PipeSensorA);
+    CloseHandle(PipeSensorB);
+    CloseHandle(PipeDsplay);
+    CloseHandle(PipeParada);
     return 0;
 }
 
